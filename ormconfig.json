@@ -1,0 +1,14 @@
+{
+  "dialect": "mysql",
+  "host": "localhost",
+  "port": 3306,
+  "username": "root",
+  "password": "a2153218",
+  "database": "ued",
+  "pool" : {
+    "max" : 5,
+    "min" : 0,
+    "acquire": 30000,
+    "idle": 10000
+  }
+}
