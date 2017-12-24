@@ -42,7 +42,7 @@ app.use((req,res,next)=>{
 });
 
 //中间间
-const Login = require('./Model/Login');
+const Login = require('./model/Login');
 app.use(async (req,res,next)=>{
     req.cookie = new Cookies(req,res);
     req.userInfo = {};
