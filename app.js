@@ -22,34 +22,13 @@ app.set('views','./views');
 // 第一个参数必须是engine html 第二个参数是 设置模板引擎的方法名字 ；
 app.set('engine html','html');
 
+app.use(bodyParser.json());
 
 app.use(bodyParser.urlencoded({extended:true}));
 
-app.use(bodyParser.json());
 //静态文件的设置
 app.use(express.static(path.join(__dirname,'public')));
-//中间间
-const Login = require('./Model/Login');
-app.use(async (req,res,next)=>{
-    req.cookie = new Cookies(req,res);
-    let pathname = req._parsedOriginalUrl.pathname;
-    if(pathname != '/admin/login'){
-        let cookie = req.cookie.get('cookie');
-        if(!cookie){ //未登录
-            return res.redirect('/admin/login')
-        }
-        let data = await Login.findAll({
-            where : {
-                cookie : cookie
-            }
-        });
-        if(data.length === 0){  //未登录
-            return res.redirect('/admin/login')
-        }
-        next();
-    }
-    next();
-});
+
 
 app.use((req,res,next)=>{
     res.stackResponse = (code,message,data)=>{
@@ -60,6 +39,34 @@ app.use((req,res,next)=>{
         return responseData;
     };
     next();
+});
+
+//中间间
+const Login = require('./Model/Login');
+app.use(async (req,res,next)=>{
+    req.cookie = new Cookies(req,res);
+    req.userInfo = {};
+    let cookie = req.cookie.get('cookie');
+    let url = req.url;
+    if(url.indexOf('login') == -1){
+        if(!cookie){ //未登录
+            return res.send(res.stackResponse(799,'尚未登录',{}))
+        }
+        let data = await Login.findAll({
+            where : {
+                cookie : cookie
+            }
+        });
+        if(data.length === 0){  //未登录
+            //return res.redirect('/admin/login')
+            res.send(res.stackResponse(799,'尚未登录',{}))
+        }
+        req.userInfo.uid = data[0].uid;
+        req.userInfo.isAdmin = data[0].uid;
+        return next();
+    }else{ //登录页面
+        return next();
+    }
 });
 
 

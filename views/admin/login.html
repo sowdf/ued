@@ -48,7 +48,7 @@
                 </div><!--loginf-->
             </div><!--nopassword-->
             
-            <form id="login" action="dashboard.html" method="post">
+            <form id="login" action="http://www.baidu.com" method="post">
             	
                 <div class="username">
                 	<div class="usernameinner">
@@ -74,14 +74,4 @@
 
 </body>
 </html>
-<script>
-    window.onload = function(){
-        return false;
-        var $ =jQuery.noConflict();
-        console.log($.post);
-        $.post('/admin/login',{username:'admin',password:'admin'},function(data){
-            console.log(data);
-        });
-    }
 
-</script>

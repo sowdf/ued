@@ -4,18 +4,27 @@ jQuery(document).ready(function(){
 	jQuery('input:checkbox').uniform();
 	
 	///// LOGIN FORM SUBMIT /////
-	jQuery('#login').submit(function(){
-	
-		if(jQuery('#username').val() == '' && jQuery('#password').val() == '') {
+	jQuery('#login').submit(function(ev){
+		var username = jQuery('#username').val();
+		var password = jQuery('#password').val();
+		if(username == '' && password == '') {
 			jQuery('.nousername').fadeIn();
 			jQuery('.nopassword').hide();
 			return false;	
 		}
-		if(jQuery('#username').val() != '' && jQuery('#password').val() == '') {
-			jQuery('.nopassword').fadeIn().find('.userlogged h4, .userlogged a span').text(jQuery('#username').val());
-			jQuery('.nousername,.username').hide();
-			return false;;
-		}
+
+        jQuery.post('/admin/login',{username:username,password:password},function(data){
+			if(data.code == 100){
+                setTimeout(function(){
+                    location.href = '/admin';
+                },1000)
+			}else{
+                jQuery('.nopassword').fadeIn().find('.userlogged h4, .userlogged a span').text(jQuery('#username').val());
+                jQuery('.nousername,.username').hide();
+			}
+		});
+        ev.preventDefault();
+        ev.stopPropagation();
 	});
 	
 	///// ADD PLACEHOLDER /////
