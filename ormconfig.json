@@ -3,7 +3,7 @@
   "host": "120.24.169.84",
   "port": 3306,
   "username": "root",
-  "password": "******",
+  "password": "*******",
   "database": "ued",
   "pool" : {
     "max" : 5,
