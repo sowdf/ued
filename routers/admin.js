@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const User = require('../Model/User');
-const Login = require('../Model/Login');
+const User = require('../model/User');
+const Login = require('../model/Login');
 const md5 = require('md5');
-const Week = require('../Model/Week');
-const Weekly = require('../Model/Weekly');
+const Week = require('../model/Week');
+const Weekly = require('../model/Weekly');
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
 Weekly.belongsTo(Week, {foreignKey: 'weekId'});
@@ -56,7 +56,6 @@ router.get('/getWeek', async (req, res, next) => {
 });
 
 
-
 /*
  * 编辑 周报
  * */
@@ -78,9 +77,9 @@ router.post('/editWeekly', async (req, res, next) => {
         });
         return res.send(res.stackResponse(100, '添加成功', {}));
     } else {
-        Weekly.update( {
+        Weekly.update({
             weekWork, nextWork, conclusion
-        },{
+        }, {
             where: { //更新
                 uid: uid,
                 weekId: weekId
@@ -97,9 +96,9 @@ router.get('/allWeekly', async (req, res, next) => {
     let {userInfo: {uid}} = req;
 
     let data = await Weekly.findAll({
-        include : [
+        include: [
             {
-                model : Week
+                model: Week
             }
         ],
         where: {
@@ -114,19 +113,19 @@ router.get('/allWeekly', async (req, res, next) => {
  * 周报汇总
  * */
 router.get('/weeklySummary', async (req, res, next) => {
-    let {query:{weekId}} = req;
+    let {query: {weekId}} = req;
     let users = await User.findAll({
-        where : {
-            isWorking:1
+        where: {
+            isWorking: 1
         }
     });
     let data = await Week.findAll({
-        where : {
-            weekId : weekId
+        where: {
+            weekId: weekId
         },
-        include : [
+        include: [
             {
-                model : Weekly
+                model: Weekly
             }
         ]
     });
@@ -136,15 +135,15 @@ router.get('/weeklySummary', async (req, res, next) => {
 
     //数据格式化 以uid为ke
     let stackNewData = {};
-    newData.weeklies.map((item,index)=>{ //简历关系
+    newData.weeklies.map((item, index) => { //简历关系
         stackNewData[item.uid] = item;
     });
 
-    users.map((item,index)=>{
+    users.map((item, index) => {
         let data = stackNewData[item.uid];
-        if(data){ // 判读 数据存在吗如果存在就说明有写周报
+        if (data) { // 判读 数据存在吗如果存在就说明有写周报
             data.username = item.username;
-        }else{ //没有写周报的人进入这边
+        } else { //没有写周报的人进入这边
             newData.noWriteAry.push(item.username)
         }
     });
@@ -158,20 +157,20 @@ router.get('/weeklySummary', async (req, res, next) => {
  * */
 router.get('/weeklyList', async (req, res, next) => {
     let userCount = await User.count({
-        where : {
-            isWorking:1
+        where: {
+            isWorking: 1
         }
     });
     let data = await Week.findAll({
-        include : [
+        include: [
             {
-                model : Weekly
+                model: Weekly
             }
         ]
     });
     let newData = JSON.parse(JSON.stringify(data));
-    newData.map((item,index)=>{
-        let weeklyLength =  item.weeklies.length;
+    newData.map((item, index) => {
+        let weeklyLength = item.weeklies.length;
         item.noWriteNum = userCount - weeklyLength;
         item.writeNum = weeklyLength;
         item.allNum = userCount;
@@ -185,12 +184,12 @@ router.get('/weeklyList', async (req, res, next) => {
  * 一个人的周报
  * */
 router.get('/oneWeekly', async (req, res, next) => {
-    let {userInfo: {uid},query:{weekId}} = req;
-    if(weekId){ //看看是否存在 如果存在就给他想要的
+    let {userInfo: {uid}, query: {weekId}} = req;
+    if (weekId) { //看看是否存在 如果存在就给他想要的
         let data = await Weekly.findAll({
-            include : [
+            include: [
                 {
-                    model : Week
+                    model: Week
                 }
             ],
             where: {
@@ -199,13 +198,13 @@ router.get('/oneWeekly', async (req, res, next) => {
             }
         });
         let newData = {
-            weekWork : data[0].weekWork,
-            nextWork : data[0].nextWork,
-            conclusion : data[0].conclusion,
-            wid : data[0].wid,
-            weekId : data[0].weekId,
-            startTimeText : data[0].week.startTimeText,
-            endTimeText : data[0].week.endTimeText
+            weekWork: data[0].weekWork,
+            nextWork: data[0].nextWork,
+            conclusion: data[0].conclusion,
+            wid: data[0].wid,
+            weekId: data[0].weekId,
+            startTimeText: data[0].week.startTimeText,
+            endTimeText: data[0].week.endTimeText
         };
         return res.send(res.stackResponse(100, 'success', newData));
     }
@@ -214,31 +213,31 @@ router.get('/oneWeekly', async (req, res, next) => {
         order: [['weekId', 'DESC']]
     });
     let weeklyData = await Weekly.findAll({
-        where : {
-            uid : uid,
-            weekId : weekData[0].weekId
+        where: {
+            uid: uid,
+            weekId: weekData[0].weekId
         }
     });
-    if(weeklyData.length === 0){ //表示没有写周报
+    if (weeklyData.length === 0) { //表示没有写周报
         let newData = {
-            weekWork : "",
-            nextWork : "",
-            conclusion : "",
-            wid : "",
-            weekId : weekData[0].weekId,
-            startTimeText : weekData[0].startTimeText,
-            endTimeText : weekData[0].endTimeText
+            weekWork: "",
+            nextWork: "",
+            conclusion: "",
+            wid: "",
+            weekId: weekData[0].weekId,
+            startTimeText: weekData[0].startTimeText,
+            endTimeText: weekData[0].endTimeText
         }
         return res.send(res.stackResponse(100, 'success', newData));
-    }else{
+    } else {
         let newData = {
-            weekWork : weeklyData[0].weekWork,
-            nextWork : weeklyData[0].nextWork,
-            conclusion : weeklyData[0].conclusion,
-            wid : weeklyData[0].wid,
-            weekId : weekData[0].weekId,
-            startTimeText : weekData[0].startTimeText,
-            endTimeText : weekData[0].endTimeText
+            weekWork: weeklyData[0].weekWork,
+            nextWork: weeklyData[0].nextWork,
+            conclusion: weeklyData[0].conclusion,
+            wid: weeklyData[0].wid,
+            weekId: weekData[0].weekId,
+            startTimeText: weekData[0].startTimeText,
+            endTimeText: weekData[0].endTimeText
         };
         return res.send(res.stackResponse(100, 'success', newData));
     }
@@ -250,19 +249,19 @@ router.get('/oneWeekly', async (req, res, next) => {
  * admin 退出登录
  * */
 router.get('/logout', (req, res, next) => {
-    req.cookie.set('cookie','');
+    req.cookie.set('cookie', '');
     return res.send(res.stackResponse(100, 'success', {}));
 });
 
 /*
  * admin 用户信息
  * */
-router.get('/userInfo',async (req, res, next) => {
-    let {userInfo:{uid}} = req;
+router.get('/userInfo', async (req, res, next) => {
+    let {userInfo: {uid}} = req;
     let data = await User.findAll({
-        where : {
-            uid : uid,
-            isWorking : 1
+        where: {
+            uid: uid,
+            isWorking: 1
         }
     });
     let newData = JSON.parse(JSON.stringify(data[0]));
@@ -277,7 +276,7 @@ router.get('/userInfo',async (req, res, next) => {
 router.get('/userList', async (req, res, next) => {
     let data = await User.findAll();
     let newData = JSON.parse(JSON.stringify(data));
-    newData.map((item,index)=>{
+    newData.map((item, index) => {
         delete item.password;
         return item;
     });
@@ -289,16 +288,16 @@ router.get('/userList', async (req, res, next) => {
  * 添加用户
  * */
 router.post('/userAdd', async (req, res, next) => {
-    let {body : {account,username,password},userInfo:{isAdmin}} = req;
-    if(isAdmin){
+    let {body: {account, username, password}, userInfo: {isAdmin}} = req;
+    if (isAdmin) {
         return res.send(res.stackResponse(98, '权限不足，你不是管理员', {}));
     }
     let data = await User.findAll({
-        where : {
-            account : account
+        where: {
+            account: account
         }
     });
-    if(data.length != 0){
+    if (data.length != 0) {
         return res.send(res.stackResponse(99, '该账账号已存在', {}));
     }
     User.create({
