@@ -16,6 +16,7 @@ const Login = db.define('login',{
 });
 Login.sync();
 
+
 module.exports = Login;
 
 

@@ -18,6 +18,7 @@ router.get('/login', (req, res, next) => {
 
 router.post('/login', async (req, res, next) => {
     let {body: {account, password}} = req;
+    console.log(account);
     let data = await User.findAll({where: {account: account}});
     if (data.length === 0) {
         return res.send(res.stackResponse(99, '用户不存在'));

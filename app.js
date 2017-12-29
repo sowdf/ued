@@ -43,6 +43,8 @@ app.use((req,res,next)=>{
 
 //中间间
 const Login = require('./model/Login');
+const UserInfo = require('./model/UserInfo');
+Login.belongsTo(UserInfo,{foreignKey:'uid'});
 app.use(async (req,res,next)=>{
     req.cookie = new Cookies(req,res);
     req.userInfo = {};
@@ -53,10 +55,16 @@ app.use(async (req,res,next)=>{
             return res.send(res.stackResponse(799,'尚未登录',{}))
         }
         let data = await Login.findAll({
+            include : [
+                {
+                    model : 'UserInfo'
+                }
+            ],
             where : {
                 cookie : cookie
             }
         });
+        console.log(data);
         if(data.length === 0){  //未登录
             //return res.redirect('/admin/login')
             res.send(res.stackResponse(799,'尚未登录',{}))
@@ -72,8 +80,10 @@ app.use(async (req,res,next)=>{
 
 let main = require('./routers/index');
 let admin = require('./routers/admin');
+let user = require('./routers/user');
 app.use('/',main);
 app.use('/admin',admin);
+app.use('/admin',user);
 app.listen('1818',(err)=>{
     if(err){
         throw err;
