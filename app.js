@@ -54,23 +54,22 @@ app.use(async (req,res,next)=>{
         if(!cookie){ //未登录
             return res.send(res.stackResponse(799,'尚未登录',{}))
         }
+
         let data = await Login.findAll({
             include : [
                 {
-                    model : 'UserInfo'
+                    model : UserInfo
                 }
             ],
             where : {
                 cookie : cookie
             }
         });
-        console.log(data);
         if(data.length === 0){  //未登录
             //return res.redirect('/admin/login')
             res.send(res.stackResponse(799,'尚未登录',{}))
         }
-        req.userInfo.uid = data[0].uid;
-        req.userInfo.isAdmin = data[0].uid;
+        req.userInfo = data[0].userInfo;
         return next();
     }else{ //登录页面
         return next();
