@@ -13,7 +13,7 @@ const UserInfo = db.define('userInfo',{
     },
     dutyid : {
         type : Sequelize.INTEGER(11),
-        allowNull: true,
+        defaultValue: 1,
     },
     isAdmin : {
         type: Sequelize.INTEGER(1),
@@ -42,6 +42,10 @@ const UserInfo = db.define('userInfo',{
     username : { // 用户名
         type : Sequelize.STRING(30),
         defaultValue :  ''
+    },
+    workNumber : {
+        type : Sequelize.INTEGER(11),
+        allowNull : true
     },
     email : {
         type : Sequelize.STRING(100),

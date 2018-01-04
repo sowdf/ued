@@ -4,6 +4,7 @@ const User = require('../model/User');
 const Login = require('../model/Login');
 const md5 = require('md5');
 const Week = require('../model/Week');
+const UserInfo = require('../model/UserInfo');
 const Weekly = require('../model/Weekly');
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
@@ -18,7 +19,6 @@ router.get('/login', (req, res, next) => {
 
 router.post('/login', async (req, res, next) => {
     let {body: {account, password}} = req;
-    console.log(account);
     let data = await User.findAll({where: {account: account}});
     if (data.length === 0) {
         return res.send(res.stackResponse(99, '用户不存在'));
@@ -115,9 +115,10 @@ router.get('/allWeekly', async (req, res, next) => {
  * */
 router.get('/weeklySummary', async (req, res, next) => {
     let {query: {weekId}} = req;
-    let users = await User.findAll({
+    let users = await UserInfo.findAll({ //获取所有用户的用户信息
         where: {
-            isWorking: 1
+            isWorking: 1,
+            dutyid : 1 // 前端
         }
     });
     let data = await Week.findAll({
@@ -137,7 +138,7 @@ router.get('/weeklySummary', async (req, res, next) => {
     //数据格式化 以uid为ke
     let stackNewData = {};
     newData.weeklies.map((item, index) => { //简历关系
-        stackNewData[item.uid] = item;
+        stackNewData[item.uid] = item; //以后uid 为 key 下面判断的时候用
     });
 
     users.map((item, index) => {
@@ -148,7 +149,6 @@ router.get('/weeklySummary', async (req, res, next) => {
             newData.noWriteAry.push(item.username)
         }
     });
-
     return res.send(res.stackResponse(100, 'success', newData));
 });
 
@@ -157,9 +157,10 @@ router.get('/weeklySummary', async (req, res, next) => {
  * 周报列表
  * */
 router.get('/weeklyList', async (req, res, next) => {
-    let userCount = await User.count({
+    let userCount = await UserInfo.count({
         where: {
-            isWorking: 1
+            isWorking: 1,
+            dutyid : 1, // 1表示前端部门
         }
     });
     let data = await Week.findAll({
@@ -259,7 +260,7 @@ router.get('/logout', (req, res, next) => {
  * */
 router.get('/userInfo', async (req, res, next) => {
     let {userInfo: {uid}} = req;
-    let data = await User.findAll({
+    let data = await UserInfo.findAll({
         where: {
             uid: uid,
             isWorking: 1
