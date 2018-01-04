@@ -1,6 +1,5 @@
 const db = require('../data/db');
 const Sequelize = require('sequelize');
-
 let Week = db.define('week',{
     weekId : {
         type : Sequelize.INTEGER(11),
