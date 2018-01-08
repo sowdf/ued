@@ -17,6 +17,7 @@ router.get('/login', (req, res, next) => {
     res.render('admin/login.html');
 });
 
+
 router.post('/login', async (req, res, next) => {
     let {body: {account, password}} = req;
     let data = await User.findAll({where: {account: account}});

@@ -20,7 +20,6 @@ const Group = db.define('group',{
 Group.sync();
 
 
-
 module.exports = User;
 
 
